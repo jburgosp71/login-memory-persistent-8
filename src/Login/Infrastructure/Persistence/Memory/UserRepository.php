@@ -54,12 +54,12 @@ class UserRepository implements UserSaveRepositoryInterface, UserSearchRepositor
         return null;
     }
 
-    function encodePassword(string $password): String
+    private function encodePassword(string $password): String
     {
         return base64_encode($password);
     }
 
-    function decodePassword(string $encodedPassword): String
+    private function decodePassword(string $encodedPassword): String
     {
         return base64_decode($encodedPassword);
     }

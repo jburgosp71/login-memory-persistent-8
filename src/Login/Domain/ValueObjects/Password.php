@@ -28,7 +28,7 @@ class Password
         return password_verify($givenPassword, $this->hashedPassword);
     }
 
-    private static function hashPassword(string $password) : String
+    private function hashPassword(string $password) : String
     {
         return password_hash($password,  PASSWORD_DEFAULT);
     }

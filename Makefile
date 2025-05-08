@@ -38,3 +38,7 @@ composer-install: ## Install PHP composer dependencies (/vendors)
 composer-dump-autoload: ## Dump/rebuild the composer autoload
 	$(RUN_PHP) "composer dump-autoload -o -a"
 
+.PHONY: tests
+tests: ## Launch all tests
+	$(RUN_PHP) "./vendor/bin/phpunit"
+
