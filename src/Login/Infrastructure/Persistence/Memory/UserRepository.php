@@ -28,7 +28,7 @@ class UserRepository implements UserSaveRepositoryInterface, UserSearchRepositor
             throw new DuplicatedUserException();
         }
 
-        $this->userArray[$user->getUsername()] = $this->encodePassword($user->getPassword());
+        $this->userArray[$user->getUsername()] = $this->serializeUser($user);
     }
 
     /**
@@ -40,15 +40,28 @@ class UserRepository implements UserSaveRepositoryInterface, UserSearchRepositor
             throw new UnavailableUserException();
         }
 
-        $this->userArray[$user->getUsername()] = $this->encodePassword($user->getPassword());
+        $this->userArray[$user->getUsername()] = $this->serializeUser($user);
     }
 
     public function findByUsername(String $username): ?User
     {
         if(isset($this->userArray[$username])) {
-            $usernameValue = new Username($username);
-            $passwordValue = new Password($this->decodePassword($this->userArray[$username]));
-            return new User($usernameValue, $passwordValue);
+            $data = $this->userArray[$username];
+
+            $user = new User(
+                new Username($username),
+                new Password($this->decodePassword($data['password']))
+            );
+
+            if (isset($data['twoFactorType'])) {
+                $user->setTwoFactorType($data['twoFactorType']);
+            }
+
+            if (isset($data['googleSecret'])) {
+                $user->setGoogleSecret($data['googleSecret']);
+            }
+
+            return $user;
         }
 
         return null;
@@ -62,6 +75,15 @@ class UserRepository implements UserSaveRepositoryInterface, UserSearchRepositor
     private function decodePassword(string $encodedPassword): String
     {
         return base64_decode($encodedPassword);
+    }
+
+    private function serializeUser(User $user): array
+    {
+        return [
+            'password' => $this->encodePassword($user->getPassword()),
+            'twoFactorType' => $user->getTwoFactorType(),
+            'googleSecret' => $user->getGoogleSecret(),
+        ];
     }
 
 }

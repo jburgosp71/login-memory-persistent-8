@@ -34,4 +34,19 @@ class LoginService
 
         return true;
     }
+
+    public function getUserIfValid(string $username, string $password) : ?User
+    {
+        $user = $this->userSearchRepository->findByUsername($username);
+        if (!$user instanceof User) {
+            throw new UnavailableUserException();
+        }
+
+        if (!$user->checkPassword($password)) {
+            throw new ErrorLoginException();
+        }
+
+        return $user;
+    }
+
 }
